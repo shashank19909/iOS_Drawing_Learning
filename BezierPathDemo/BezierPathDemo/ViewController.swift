@@ -14,7 +14,8 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        drawBunny()
+//        drawBunny()
+        drawString(stringToDraw: "Hello")
         // Do any additional setup after loading the view, typically from a nib.
     }
 
@@ -81,16 +82,67 @@ class ViewController: UIViewController {
     private func drawBunny() {
         let targetFrame = CGRect(x: 0, y: 0, width: 500, height: 500)
         UIGraphicsBeginImageContext(targetFrame.size)
+
+        let context = UIGraphicsGetCurrentContext()
+        
+        let bunnyPath = UIBezierPath.bunnyPath()
+
+        // First state
+        
+        
+        // This adds clipping. Comment out if clipping is to be removed
+        let clippingPath = UIBezierPath(roundedRect:CGRect(x: 0, y: 0, width: 400 , height: 400), cornerRadius: 2.0)
+        context?.saveGState()
+        context?.addPath(clippingPath.cgPath)
+        context?.clip()
+
+        
         UIColor.green.setFill()
         UIColor.red.setStroke()
-        let bunnyPath = UIBezierPath.bunnyPath()
         bunnyPath.lineWidth = 5.0
         bunnyPath.stroke()
         bunnyPath.fill()
+
+        context?.saveGState()
+        
+        // second state
+        UIColor.blue.setFill()
+        UIColor.black.setStroke()
+
+        bunnyPath.apply(CGAffineTransform(translationX: 30, y: 20))
+        bunnyPath.lineWidth = 10.0
+        bunnyPath.fill()
+        bunnyPath.stroke()
+        
+        context?.restoreGState()
+        
+        
+        bunnyPath.apply(CGAffineTransform(translationX: 30, y: 20))
+        
+        
+        
+        // Draw with the first
+        bunnyPath.fill()
+        bunnyPath.stroke()
+
+        
+        context?.restoreGState()
+        
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         imageView?.image = image
     }
+
+    fileprivate func drawString(stringToDraw: String) {
+        let targetFrame = CGRect(x: 0, y: 0, width: 500, height: 500)
+        UIGraphicsBeginImageContext(targetFrame.size)
+        let string = stringToDraw as NSString
+        string.draw(at:  CGPoint(x: 100, y: 100), withAttributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 50)])
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        imageView?.image = image
+    }
+    
     
     
 }
