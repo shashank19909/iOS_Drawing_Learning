@@ -9,21 +9,21 @@
 import UIKit
 
 class ViewController: UIViewController {
-
+    
     @IBOutlet weak var imageView: UIImageView?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        drawBunny()
-        drawString(stringToDraw: "Hello")
+                drawCircularAlphabets()
+//        drawString(stringToDraw: "Hello")
         // Do any additional setup after loading the view, typically from a nib.
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
+    
     fileprivate func drawUpwardArrow() {
         guard let imageView = imageView else {
             return
@@ -41,7 +41,7 @@ class ViewController: UIViewController {
         UIGraphicsEndImageContext()
         imageView.image = image
     }
-
+    
     fileprivate func drawBezierUpwardArrow() {
         guard let imageView = imageView else {
             return
@@ -61,7 +61,7 @@ class ViewController: UIViewController {
         UIGraphicsEndImageContext()
         imageView.image = image
     }
-
+    
     private func drawOverlappingCircles() {
         let targetFrame = CGRect(x: 0, y: 0, width: 200, height: 200)
         let circle1Rect = targetFrame.offsetBy(dx: 10, dy: 0)
@@ -82,11 +82,11 @@ class ViewController: UIViewController {
     private func drawBunny() {
         let targetFrame = CGRect(x: 0, y: 0, width: 500, height: 500)
         UIGraphicsBeginImageContext(targetFrame.size)
-
+        
         let context = UIGraphicsGetCurrentContext()
         
         let bunnyPath = UIBezierPath.bunnyPath()
-
+        
         // First state
         
         
@@ -95,20 +95,20 @@ class ViewController: UIViewController {
         context?.saveGState()
         context?.addPath(clippingPath.cgPath)
         context?.clip()
-
+        
         
         UIColor.green.setFill()
         UIColor.red.setStroke()
         bunnyPath.lineWidth = 5.0
         bunnyPath.stroke()
         bunnyPath.fill()
-
+        
         context?.saveGState()
         
         // second state
         UIColor.blue.setFill()
         UIColor.black.setStroke()
-
+        
         bunnyPath.apply(CGAffineTransform(translationX: 30, y: 20))
         bunnyPath.lineWidth = 10.0
         bunnyPath.fill()
@@ -124,7 +124,7 @@ class ViewController: UIViewController {
         // Draw with the first
         bunnyPath.fill()
         bunnyPath.stroke()
-
+        
         
         context?.restoreGState()
         
@@ -132,7 +132,7 @@ class ViewController: UIViewController {
         UIGraphicsEndImageContext()
         imageView?.image = image
     }
-
+    
     fileprivate func drawString(stringToDraw: String) {
         let targetFrame = CGRect(x: 0, y: 0, width: 500, height: 500)
         UIGraphicsBeginImageContext(targetFrame.size)
@@ -143,7 +143,47 @@ class ViewController: UIViewController {
         imageView?.image = image
     }
     
-    
+    fileprivate func drawCircularAlphabets() {
+        let alphabets = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        
+        UIGraphicsBeginImageContext(self.view.bounds.size)
+        let context = UIGraphicsGetCurrentContext()
+        
+        
+        let center = self.view.center
+        let radius = center.x * 0.99
+        
+        // Translate the context center
+        
+        context?.translateBy(x: center.x, y: center.y)
+        
+        for (i, letter) in alphabets.characters.enumerated() {
+            
+            let letterSize = (String(letter) as NSString).size(attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 12.0)])
+            
+            
+            // Calculate the current angular offset
+            let theta = Double(i) * (2 * Double.pi / Double(alphabets.characters.count))
+            // Encapsulate each stage of the drawing
+            context?.saveGState()
+            // Rotate the context
+            
+            context?.rotate(by: CGFloat(theta))
+            // Translate up to the edge of the radius and move left by // half the letter width. The height translation is negative // as this drawing sequence uses the UIKit coordinate system. // Transformations that move up go to lower y values.
+            context?.translateBy(x: -letterSize.width / 2, y: -radius)
+            
+            // Draw the letter and pop the transform state
+            (String(letter) as NSString).draw(at:  CGPoint(x: 0, y: 0), withAttributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 50)])
+            context?.restoreGState()
+        }
+        // Retrieve and return the image
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        imageView?.image = image
+        
+        
+        
+    }
     
 }
 
